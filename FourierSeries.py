@@ -9,8 +9,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 import sympy as sp
 import seaborn as sns
-# import IPython
-# sp.init_printing(use_unicode=False, wrap_line=False)
 
 class FourierSeries:
     """" A class to compute and plot Fourier Series of a given length and number of coeficients """""
@@ -19,10 +17,15 @@ class FourierSeries:
     def __init__(self, f, length = sp.pi, series_type = None):
         self.f = f
         self.L = length
-        self.series_type = series_type
+        self.series_type = series_type 
         self.a = []
         self.b = [0]
         self._series = []
+        if self.series_type is None:
+            if f(x) == f(-x):
+                self.series_type = 'cos'
+            elif -f(x) == f(-x):
+                self.series_type = 'sin'
     
     def __str__(self):
         if self.series_type:
@@ -103,10 +106,10 @@ class FourierSeries:
         p = sp.plotting.plot(self.f(x), (x, -self.L * scale, self.L * scale), show=False, line_color=f_color,
                             title=str(self), legend=False)
         colors = sns.color_palette(
-            cmap, n_colors=max_coef - min_coef + 2)
+            cmap, n_colors=max_coef - min_coef + 1)
         for N in range(min_coef, max_coef+1):
             p.extend(sp.plotting.plot(self._series[N], (x, -self.L * scale, self.L * scale), show=False, title=str(
-                self), line_color=colors[N], steps=self.L / 4, label=str(N) + ' coefficients', legend=True))
+                self), line_color=colors[N-min_coef], steps=self.L / 4, label=str(N) + ' coefficients', legend=True))
         return p
 
     def plot_series_range(self, min_coef = 1, max_coef = 5, scale=1.5, cmap = 'autumn_r', f_color = 'b', size = (10,8)):
@@ -115,9 +118,9 @@ class FourierSeries:
         p = sp.plotting.plot(show=False, line_color=f_color,
                             title=str(self), legend=True)
         colors = sns.color_palette(
-            cmap, n_colors=max_coef - min_coef + 2)
+            cmap, n_colors= max_coef - min_coef + 1)
         for N in range(min_coef, max_coef+1):
             p.extend(sp.plotting.plot(self._series[N], (x, -self.L * scale, self.L * scale), show=False, title=str(
-                self), line_color=colors[N], steps=self.L / 4, label=str(N) + ' coefficients', legend=True, size = size))
+                self), line_color=colors[N-min_coef], steps=self.L / 4, label=str(N) + ' coefficients', legend=True, size = size))
             p.rcParams['figure.figsize'] = 10, 8
         return p
